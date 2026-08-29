@@ -35,3 +35,5 @@ jobs:
       - name: semver
         uses: obi1kenobi/cargo-semver-checks-action@v2
         continue-on-error: true
+        with:
+          package: xproxy-core
