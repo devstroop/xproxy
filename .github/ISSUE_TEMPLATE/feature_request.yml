@@ -1,0 +1,21 @@
+name: Feature Request
+description: New feature or request (requires Discussion first)
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: "Open a Discussion (Ideas/General) first. Issues without linked Discussion may be closed."
+  - type: input
+    id: discussion
+    attributes:
+      label: Linked Discussion
+      placeholder: "https://github.com/devstroop/xproxy/discussions/..."
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal (unbiased, list alternatives)
+      placeholder: "Proposal + alternatives + trade-offs"
+    validations:
+      required: true

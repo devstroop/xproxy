@@ -1,0 +1,19 @@
+name: Bug Report
+description: Something isn't working
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "Check Discussions #1–#6 before filing. In-chat material is not canonical."
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      placeholder: Steps to reproduce, expected vs actual
+    validations:
+      required: true
+  - type: textarea
+    id: verify
+    attributes:
+      label: Verification
+      placeholder: "cargo check/test output, logs"
