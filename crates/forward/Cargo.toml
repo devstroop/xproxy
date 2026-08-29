@@ -1,0 +1,12 @@
+[package]
+name = "xproxy-forward"
+version.workspace = true
+edition.workspace = true
+description = "Forward proxy crate for xproxy"
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+xproxy-core.workspace = true

@@ -1,0 +1,12 @@
+[package]
+name = "xproxy-reverse"
+version.workspace = true
+edition.workspace = true
+description = "Reverse proxy crate for xproxy"
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+xproxy-core.workspace = true
