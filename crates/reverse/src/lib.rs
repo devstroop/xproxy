@@ -1,8 +1,10 @@
+pub mod concurrency;
 pub mod health;
 pub mod router;
 pub mod selector;
 pub mod tls;
 
+pub use concurrency::ConcurrencyLimiter;
 pub use health::{HealthChecker, UpstreamHealth};
 pub use router::{Route, RouteTable, SharedTable};
 pub use selector::{P2c, RoundRobin, Selector, Upstream};
