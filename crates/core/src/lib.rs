@@ -5,9 +5,11 @@
 pub mod config;
 pub mod error;
 pub mod net;
+pub mod orchestrator;
 
 pub use config::{Config, Mode};
 pub use error::{Error, Result};
+pub use orchestrator::{ModeState, Orchestrator, SharedModeState};
 
 /// Proxy mode discriminant.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
