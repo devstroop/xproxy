@@ -4,8 +4,9 @@
 
 pub mod config;
 pub mod error;
+pub mod net;
 
-pub use config::Config;
+pub use config::{Config, Mode};
 pub use error::{Error, Result};
 
 /// Proxy mode discriminant.
