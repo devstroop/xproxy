@@ -1,0 +1,46 @@
+[workspace]
+members = ["crates/*"]
+resolver = "3"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+authors = []
+license = "MIT OR Apache-2.0"
+repository = ""
+readme = "README.md"
+rust-version = "1.85"
+
+[workspace.lints.rust]
+warnings = "warn"
+missing_docs = "allow"
+unused_lifetimes = "warn"
+
+[workspace.lints.clippy]
+all = "warn"
+pedantic = "allow"
+
+[workspace.dependencies]
+xproxy-core = { path = "crates/core" }
+xproxy-forward = { path = "crates/forward" }
+xproxy-reverse = { path = "crates/reverse" }
+
+[package]
+name = "xproxy"
+version.workspace = true
+edition.workspace = true
+description = "xproxy - forward and reverse proxy"
+readme = "README.md"
+license.workspace = true
+
+[[bin]]
+name = "xproxy"
+path = "src/main.rs"
+
+[dependencies]
+xproxy-core.workspace = true
+xproxy-forward.workspace = true
+xproxy-reverse.workspace = true
+
+[lints]
+workspace = true

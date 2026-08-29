@@ -1,0 +1,11 @@
+[package]
+name = "xproxy-core"
+version.workspace = true
+edition.workspace = true
+description = "Core types and traits for xproxy"
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]

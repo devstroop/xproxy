@@ -1,0 +1,52 @@
+# Rust build artifacts
+/target/
+**/target/
+*.rs.bk
+*.pdb
+
+# Cargo — keep Cargo.lock for binary workspace (do not ignore)
+# Cargo.lock
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.orig
+*.rej
+
+# OS
+.DS_Store
+Thumbs.db
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Env / secrets / local config (keep examples)
+.env
+.env.*
+!.env.example
+config.toml
+xproxy.toml
+!config.example.toml
+!xproxy.example.toml
+
+# TLS / CA secrets generated locally (keep committed examples only)
+ca.key
+ca.crt
+*.key
+*.pem
+!certs/example.*
+!**/example.*.key
+!**/example.*.pem
+
+# Logs & coverage
+*.log
+lcov.info
+coverage/
+tarpaulin-report.html
+
+# Direnv / tooling
+.direnv/
+.sdk/
