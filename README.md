@@ -1,6 +1,6 @@
 # xproxy
 
-Dual-mode proxy — forward (egress: HTTP/HTTPS/SOCKS) and reverse (ingress: routing, LB, TLS) on a single binary with policy-based destination resolution. Currently workspace boilerplate only; implementation gated behind GitHub Discussions.
+Dual-mode proxy — forward (egress: HTTP/HTTPS/SOCKS) and reverse (ingress: routing, LB, TLS) on a single binary with policy-based destination resolution.
 
 ## Workspace layout
 
