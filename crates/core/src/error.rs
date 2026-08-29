@@ -1,28 +1,38 @@
-//! Minimal error scaffolding.
+//! Typed errors — preserves `io::ErrorKind` for circuit breakers.
 
 /// Crate result alias.
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
-/// Generic error placeholder.
-#[derive(Debug)]
-pub struct Error(pub String);
+/// Core error — typed, no `String` wrapper at `error.rs:7` placeholder.
+#[derive(Debug, thiserror::Error)]
+pub enum Error {
+    #[error("io: {0}")]
+    Io(#[from] std::io::Error),
 
-impl std::fmt::Display for Error {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&self.0)
-    }
+    #[error("config: {0}")]
+    Config(String),
+
+    #[error("validation: {0}")]
+    Validation(String),
+
+    #[error("upstream {0} unavailable: {1}")]
+    Upstream(String, #[source] std::io::Error),
+
+    #[error("auth failed")]
+    Auth,
+
+    #[error("tls: {0}")]
+    Tls(String),
 }
-
-impl std::error::Error for Error {}
 
 impl From<String> for Error {
     fn from(s: String) -> Self {
-        Self(s)
+        Self::Config(s)
     }
 }
 
 impl From<&str> for Error {
     fn from(s: &str) -> Self {
-        Self(s.to_string())
+        Self::Config(s.to_string())
     }
 }
