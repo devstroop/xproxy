@@ -1,4 +1,6 @@
-//! Reverse proxy — boilerplate only.
+pub mod router;
+
+pub use router::{Route, RouteTable, SharedTable};
 
 use xproxy_core::{Config, Proxy, ProxyMode};
 

@@ -10,3 +10,5 @@ workspace = true
 
 [dependencies]
 xproxy-core.workspace = true
+matchit = "0.8"
+arc-swap = "1.7"
