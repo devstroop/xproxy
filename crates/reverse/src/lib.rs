@@ -1,6 +1,8 @@
 pub mod router;
+pub mod selector;
 
 pub use router::{Route, RouteTable, SharedTable};
+pub use selector::{P2c, RoundRobin, Selector, Upstream};
 
 use xproxy_core::{Config, Proxy, ProxyMode};
 
