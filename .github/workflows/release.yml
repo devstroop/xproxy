@@ -2,7 +2,7 @@ name: release
 
 on:
   push:
-    branches: [main, master, develop]
+    branches: [main, develop]
   workflow_dispatch:
 
 permissions:
@@ -47,7 +47,7 @@ jobs:
             RUN_BETA="${GITHUB_RUN_NUMBER:-$BETA_COUNT}"
             TAG="${NEXT}-beta.${RUN_BETA}"
           else
-            # main / master -> stable
+            # main -> stable
             TAG="${NEXT}"
             # If tag already exists (re-run), append build number
             if git rev-parse "$TAG" >/dev/null 2>&1; then
@@ -82,7 +82,7 @@ jobs:
           body: |
             **Branch:** `${{ steps.tag.outputs.branch }}` → `${{ steps.tag.outputs.tag }}` (`prerelease=${{ steps.tag.outputs.prerelease }}`)
 
-            - main/master → stable latest (`vX.Y.Z`, `make_latest=true`)
+            - main → stable latest (`vX.Y.Z`, `make_latest=true`)
             - develop → pre-release beta (`vX.Y.Z-beta.N`, `prerelease=true`)
 
             Built from `${{ github.sha }}` on `${{ github.ref_name }}`.
