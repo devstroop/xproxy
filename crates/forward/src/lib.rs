@@ -1,9 +1,11 @@
+pub mod ca;
 pub mod connect;
 pub mod demux;
 pub mod dns;
 pub mod http;
 pub mod socks;
 
+pub use ca::{Ca, fingerprint};
 pub use connect::{
     ConnectTarget, DEFAULT_ALLOW_PORTS, is_port_allowed, parse_target, validate_target,
 };

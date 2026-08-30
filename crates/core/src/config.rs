@@ -31,6 +31,18 @@ pub struct Config {
     /// Trusted proxies — CIDRs that are allowed to send `X-Forwarded-For` etc. Empty = strip all.
     #[serde(default)]
     pub trusted_proxies: Vec<String>,
+
+    /// CA certificate path for forward MITM (external `ca.crt` preferred).
+    #[serde(default)]
+    pub ca_cert: Option<String>,
+
+    /// CA private key path for forward MITM (external `ca.key` preferred, `chmod 600`).
+    #[serde(default)]
+    pub ca_key: Option<String>,
+
+    /// Whether to generate CA via `rcgen` if missing (dev-only, `false` default).
+    #[serde(default)]
+    pub generate_ca: bool,
 }
 
 impl Config {
@@ -63,6 +75,21 @@ impl Config {
                 return Err(crate::Error::Validation(format!(
                     "invalid trusted_proxies cidr `{cidr}`"
                 )));
+            }
+        }
+        match (&self.ca_cert, &self.ca_key) {
+            (Some(c), Some(k)) => {
+                if c.trim().is_empty() || k.trim().is_empty() {
+                    return Err(crate::Error::Validation(
+                        "ca_cert and ca_key must be non-empty".into(),
+                    ));
+                }
+            }
+            (None, None) => {}
+            _ => {
+                return Err(crate::Error::Validation(
+                    "both ca_cert and ca_key must be set together".into(),
+                ));
             }
         }
         Ok(())

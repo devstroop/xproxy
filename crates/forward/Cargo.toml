@@ -10,10 +10,13 @@ workspace = true
 
 [dependencies]
 xproxy-core.workspace = true
-tokio = { version = "1", features = ["net", "io-util"] }
+tokio = { version = "1", features = ["net", "io-util", "fs"] }
 hyper = { version = "1", features = ["client", "http1"] }
 hyper-util = { version = "0.1", features = ["client-legacy", "http1", "tokio"] }
 http = "1"
 http-body-util = "0.1"
 bytes = "1"
 base64 = "0.22"
+rcgen = "0.13"
+moka = { version = "0.12", features = ["future"] }
+sha2 = "0.10"
