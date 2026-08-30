@@ -1,5 +1,9 @@
+pub mod connect;
 pub mod demux;
 
+pub use connect::{
+    ConnectTarget, DEFAULT_ALLOW_PORTS, is_port_allowed, parse_target, validate_target,
+};
 pub use demux::{Protocol, dispatch, peek_protocol};
 
 use xproxy_core::{Config, Proxy, ProxyMode};
