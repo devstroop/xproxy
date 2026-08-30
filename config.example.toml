@@ -1,0 +1,25 @@
+# xproxy.example.toml — copy to xproxy.toml and adjust
+# All fields are optional; defaults shown. Env overrides via XPROXY_* or CONFIG_PATH.
+# See crates/core/src/config.rs for validation.
+
+mode = "both" # both | forward | reverse
+listen_forward = "0.0.0.0:3128" # forward egress (HTTP/CONNECT/SOCKS5)
+listen_reverse = "0.0.0.0:8080" # reverse ingress (router/LB/TLS)
+timeout_ms = 30000 # 1000..=300000, idle 10s enforced before TraceLayer
+
+# Trusted proxies — CIDRs allowed to send X-Forwarded-For etc. Empty = strip all
+# trusted_proxies = ["10.0.0.0/8", "192.168.0.0/16", "172.16.0.0/12", "::1/128"]
+trusted_proxies = []
+
+# CA for forward MITM — external ca.crt/key preferred, generate_ca=false default
+# ca_cert = "ca.crt"
+# ca_key = "ca.key"
+# generate_ca = false # dev-only: if true, rcgen self-signed at first run, chmod 600 ca.key, WARN fingerprint
+
+# Example: external CA (recommended for auditability)
+# Mount ca.crt/ca.key as secrets, ensure chmod 600 ca.key
+# ca_cert = "/app/ca.crt"
+# ca_key = "/app/ca.key"
+
+# Example: dev CA generation (UNTRUSTED, never auto-trust)
+# generate_ca = true
