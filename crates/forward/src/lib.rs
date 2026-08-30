@@ -1,6 +1,10 @@
 pub mod demux;
+pub mod http;
 
 pub use demux::{Protocol, dispatch, peek_protocol};
+pub use http::{
+    append_via, append_via_req, forwarding_client, is_absolute_form, strip_hop_headers,
+};
 
 use xproxy_core::{Config, Proxy, ProxyMode};
 
