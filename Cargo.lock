@@ -1330,6 +1330,7 @@ dependencies = [
 name = "xproxy-core"
 version = "0.1.0"
 dependencies = [
+ "http",
  "serde",
  "thiserror",
  "tokio",
