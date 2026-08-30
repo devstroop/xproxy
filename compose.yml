@@ -1,0 +1,35 @@
+services:
+  xproxy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: xproxy:local
+    restart: unless-stopped
+    stop_grace_period: 10s
+    environment:
+      - RUST_LOG=${RUST_LOG:-info}
+      - CONFIG_PATH=${CONFIG_PATH:-/app/config.example.toml}
+      - XPROXY_MODE=${XPROXY_MODE:-both}
+    # Config is file+env merged via xproxy_core::Config (CONFIG_PATH or xproxy.toml)
+    # Mount your local xproxy.toml as /app/xproxy.toml:ro for production
+    volumes:
+      - ./config.example.toml:/app/config.example.toml:ro
+      # - ./xproxy.toml:/app/xproxy.toml:ro
+      # - ./ca.crt:/app/ca.crt:ro
+      # - ./ca.key:/app/ca.key:ro
+    ports:
+      - "${FORWARD_PORT:-3128}:3128"
+      - "${REVERSE_PORT:-8080}:8080"
+    # healthcheck disabled for distroless (no curl); enable when /health endpoint added
+    # healthcheck:
+    #   test: ["CMD", "/usr/local/bin/xproxy", "--healthcheck"]
+    #   interval: 30s
+    #   timeout: 3s
+    #   retries: 3
+    #   start_period: 5s
+    networks:
+      - xproxy-net
+
+networks:
+  xproxy-net:
+    driver: bridge
