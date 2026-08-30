@@ -1,6 +1,8 @@
 pub mod demux;
+pub mod dns;
 
 pub use demux::{Protocol, dispatch, peek_protocol};
+pub use dns::{ResolveMode, http_connect_is_remote, should_resolve_remotely};
 
 use xproxy_core::{Config, Proxy, ProxyMode};
 
