@@ -2,54 +2,49 @@ name: release
 
 on:
   push:
-    branches: [main, master, develop]
+    branches: [main, develop]
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  release:
+  tag:
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+      prerelease: ${{ steps.tag.outputs.prerelease }}
+      branch: ${{ steps.tag.outputs.branch }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - uses: dtolnay/rust-toolchain@stable
-
       - name: Determine next tag
         id: tag
         run: |
           set -e
           git fetch --tags --force
-          # Latest semver tag or fallback to Cargo.toml version
           LATEST=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.1.0")
           echo "latest tag: $LATEST"
-          # Strip leading v and any prerelease suffix
           VER=${LATEST#v}
           VER=${VER%%-*}
           IFS='.' read -r MAJOR MINOR PATCH <<< "$VER"
           MAJOR=${MAJOR:-0}
           MINOR=${MINOR:-1}
           PATCH=${PATCH:-0}
-          # Bump patch for next release (simple; use minor bump if needed via workflow_dispatch input)
           NEXT_PATCH=$((PATCH + 1))
           NEXT="v${MAJOR}.${MINOR}.${NEXT_PATCH}"
           BRANCH="${GITHUB_REF_NAME}"
           PRERELEASE="false"
           if [[ "$BRANCH" == "develop" ]]; then
             PRERELEASE="true"
-            # Beta counter: count existing beta tags for NEXT version + run_number for uniqueness
             BETA_COUNT=$(git tag --list "${NEXT}-beta.*" | wc -l)
             BETA_COUNT=$((BETA_COUNT + 1))
-            # Use run_number to ensure monotonic, fallback to BETA_COUNT
             RUN_BETA="${GITHUB_RUN_NUMBER:-$BETA_COUNT}"
             TAG="${NEXT}-beta.${RUN_BETA}"
           else
-            # main / master -> stable
+            # main -> stable
             TAG="${NEXT}"
-            # If tag already exists (re-run), append build number
             if git rev-parse "$TAG" >/dev/null 2>&1; then
               TAG="${NEXT}-build.${GITHUB_RUN_NUMBER}"
             fi
@@ -59,40 +54,114 @@ jobs:
           echo "prerelease=$PRERELEASE" >> "$GITHUB_OUTPUT"
           echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
 
-      - name: Cargo metadata version
+  build:
+    needs: tag
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            artifact: xproxy-linux-amd64
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            artifact: xproxy-linux-amd64-musl
+          - os: macos-13
+            target: x86_64-apple-darwin
+            artifact: xproxy-darwin-amd64
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            artifact: xproxy-darwin-arm64
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact: xproxy-windows-amd64.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - name: Install musl tools (Linux musl)
+        if: matrix.target == 'x86_64-unknown-linux-musl'
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
+      - name: Build release
+        run: cargo build --release --target ${{ matrix.target }}
+      - name: Rename artifact
+        shell: bash
         run: |
-          echo "Cargo.toml version: $(grep -m1 '^version' Cargo.toml | cut -d'\"' -f2 || grep -m1 'version.workspace' Cargo.toml)"
-          cargo --version
-          rustc --version
+          set -e
+          SRC="target/${{ matrix.target }}/release/xproxy"
+          if [[ "${{ matrix.target }}" == *"windows"* ]]; then
+            SRC="${SRC}.exe"
+          fi
+          ls -lh "$SRC"
+          cp "$SRC" "${{ matrix.artifact }}"
+          ls -lh "${{ matrix.artifact }}"
+          # Also create checksum
+          if command -v sha256sum >/dev/null 2>&1; then
+            sha256sum "${{ matrix.artifact }}" > "${{ matrix.artifact }}.sha256"
+          elif command -v shasum >/dev/null 2>&1; then
+            shasum -a 256 "${{ matrix.artifact }}" > "${{ matrix.artifact }}.sha256"
+          fi
+          cat "${{ matrix.artifact }}.sha256" || true
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: |
+            ${{ matrix.artifact }}
+            ${{ matrix.artifact }}.sha256
+          retention-days: 7
 
-      - name: Build release binary
-        run: cargo build --release
-
+  release:
+    needs: [tag, build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: List artifacts
+        run: |
+          ls -R dist || true
+          ls -lh dist/* 2>/dev/null || true
+          # Also prepare Cargo.lock and config.example.toml
+          cp Cargo.lock dist/ || true
+          cp config.example.toml dist/ || true
+          ls -lh dist/
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.tag.outputs.tag }}
-          prerelease: ${{ steps.tag.outputs.prerelease == 'true' }}
-          make_latest: ${{ steps.tag.outputs.prerelease != 'true' }}
+          tag_name: ${{ needs.tag.outputs.tag }}
+          prerelease: ${{ needs.tag.outputs.prerelease == 'true' }}
+          make_latest: ${{ needs.tag.outputs.prerelease != 'true' }}
           generate_release_notes: true
-          files: |
-            target/release/xproxy
-            Cargo.lock
-            config.example.toml
+          files: dist/*
           body: |
-            **Branch:** `${{ steps.tag.outputs.branch }}` → `${{ steps.tag.outputs.tag }}` (`prerelease=${{ steps.tag.outputs.prerelease }}`)
+            **Branch:** `${{ needs.tag.outputs.branch }}` → `${{ needs.tag.outputs.tag }}` (`prerelease=${{ needs.tag.outputs.prerelease }}`)
 
-            - main/master → stable latest (`vX.Y.Z`, `make_latest=true`)
+            - main → stable latest (`vX.Y.Z`, `make_latest=true`)
             - develop → pre-release beta (`vX.Y.Z-beta.N`, `prerelease=true`)
 
-            Built from `${{ github.sha }}` on `${{ github.ref_name }}`.
+            Built from `${{ github.sha }}` on `${{ github.ref_name }}` (matrix: linux-gnu, linux-musl, darwin-amd64, darwin-arm64, windows-amd64).
 
             ```sh
-            cargo build --release
-            # binary: target/release/xproxy
-            # docker: docker build -t xproxy:${{ steps.tag.outputs.tag }} .
-            # compose: docker compose up
-            # k8s: kubectl apply -f examples/k8s/
+            # Linux
+            curl -LO https://github.com/devstroop/xproxy/releases/download/${{ needs.tag.outputs.tag }}/xproxy-linux-amd64
+            chmod +x xproxy-linux-amd64 && ./xproxy-linux-amd64 --help
+            # macOS Intel
+            curl -LO https://github.com/devstroop/xproxy/releases/download/${{ needs.tag.outputs.tag }}/xproxy-darwin-amd64
+            # macOS Apple Silicon
+            curl -LO https://github.com/devstroop/xproxy/releases/download/${{ needs.tag.outputs.tag }}/xproxy-darwin-arm64
+            # Windows
+            curl -LO https://github.com/devstroop/xproxy/releases/download/${{ needs.tag.outputs.tag }}/xproxy-windows-amd64.exe
+            # Docker
+            docker build -t xproxy:${{ needs.tag.outputs.tag }} .
+            docker compose up
+            # K8s
+            kubectl apply -f examples/k8s/
             ```
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
