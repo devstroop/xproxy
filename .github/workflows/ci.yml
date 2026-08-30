@@ -8,13 +8,18 @@ on:
 
 jobs:
   ci:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy, rustfmt
       - name: fmt
+        if: matrix.os == 'ubuntu-latest'
         run: cargo fmt --check
       - name: clippy
         run: cargo clippy --all-targets -- -D warnings
@@ -22,16 +27,34 @@ jobs:
         run: cargo check --all-targets
       - name: test
         run: cargo test --all-targets
+
+  deny:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
       - name: deny
         continue-on-error: true
         run: |
           cargo install cargo-deny --locked || true
           cargo deny check || true
+
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
       - name: audit
         continue-on-error: true
         run: |
           cargo install cargo-audit --locked || true
           cargo audit || true
+
+  semver:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
       - name: semver
         uses: obi1kenobi/cargo-semver-checks-action@v2
         continue-on-error: true
