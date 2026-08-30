@@ -15,11 +15,10 @@ xproxy/
 │   ├── pull_request_template.md
 │   └── ISSUE_TEMPLATE/           # require Discussion first
 ├── src/main.rs                   # minimal wiring of xproxy-core/forward/reverse
-├── crates/
-│   ├── core/                     # xproxy-core — Config, Error, Proxy trait (lean)
-│   ├── forward/                  # xproxy-forward — ForwardProxy stub
-│   └── reverse/                  # xproxy-reverse — ReverseProxy stub
-└── docs/CONTEXT.md               # pointer to Discussions (not synthesis)
+└── crates/
+    ├── core/                     # xproxy-core — Config, Error, Proxy trait (lean)
+    ├── forward/                  # xproxy-forward — ForwardProxy stub
+    └── reverse/                  # xproxy-reverse — ReverseProxy stub
 ```
 
 Scaffold is `xproxy-core v0.1.0` with `Proxy {mode,name}`, `Config {listen_addr}`, `Error(String)` — to be replaced via RFCs.
@@ -73,7 +72,7 @@ Current primary: `xproxy` `[develop]`, mirror `xproxy-main` `[main]`. See `.gith
   - #5 Branching & collaboration — gated workflow
   - #6 Security & deployment
 - **Superseded:** `[META]` synthesis (#7) was in-chat speculative and is not canonical.
-- **Issues:** #8–#13 Epics + #14–#39 subs are `blocked:rfc`/`question` draft pending RFC consensus. No `feat/*` for proxy stack until Discussions close. See `docs/CONTEXT.md:1`.
+- **Issues:** #8–#13 Epics + #14–#39 subs are `blocked:rfc`/`question` draft pending RFC consensus. No `feat/*` for proxy stack until Discussions close.
 
 In-chat discussion materials are reference only and potentially inaccurate — keep GitHub Discussions separate.
 
