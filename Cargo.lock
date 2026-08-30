@@ -772,6 +772,7 @@ name = "xproxy-reverse"
 version = "0.1.0"
 dependencies = [
  "arc-swap",
+ "http",
  "matchit",
  "rustls",
  "rustls-native-certs",

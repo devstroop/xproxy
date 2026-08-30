@@ -12,6 +12,7 @@ workspace = true
 xproxy-core.workspace = true
 matchit = "0.8"
 arc-swap = "1.7"
+http = "1"
 rustls = { version = "0.23", default-features = false, features = ["std", "tls12"] }
 rustls-pemfile = "2"
 webpki-roots = "0.26"

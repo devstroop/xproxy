@@ -27,6 +27,10 @@ pub struct Config {
 
     /// Request timeout in ms. Must be 1000..=300000, default 30000.
     pub timeout_ms: Option<u64>,
+
+    /// Trusted proxies — CIDRs that are allowed to send `X-Forwarded-For` etc. Empty = strip all.
+    #[serde(default)]
+    pub trusted_proxies: Vec<String>,
 }
 
 impl Config {
@@ -54,7 +58,19 @@ impl Config {
                 return Err(crate::Error::Validation(format!("invalid socket addr `{addr}`")));
             }
         }
+        for cidr in &self.trusted_proxies {
+            if cidr.parse::<crate::net::Cidr>().is_err() {
+                return Err(crate::Error::Validation(format!(
+                    "invalid trusted_proxies cidr `{cidr}`"
+                )));
+            }
+        }
         Ok(())
+    }
+
+    /// Parsed CIDRs for `trusted_proxies`. Empty on parse error (validate first).
+    pub fn trusted_proxies_cidrs(&self) -> Vec<crate::net::Cidr> {
+        self.trusted_proxies.iter().filter_map(|s| s.parse().ok()).collect()
     }
 }
 
