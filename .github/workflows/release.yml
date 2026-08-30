@@ -66,7 +66,7 @@ jobs:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-musl
             artifact: xproxy-linux-amd64-musl
-          - os: macos-13
+          - os: macos-latest
             target: x86_64-apple-darwin
             artifact: xproxy-darwin-amd64
           - os: macos-latest
