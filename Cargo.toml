@@ -24,6 +24,7 @@ pedantic = "allow"
 xproxy-core = { path = "crates/core" }
 xproxy-forward = { path = "crates/forward" }
 xproxy-reverse = { path = "crates/reverse" }
+tokio = { version = "1", features = ["full"] }
 
 [package]
 name = "xproxy"
@@ -41,6 +42,7 @@ path = "src/main.rs"
 xproxy-core.workspace = true
 xproxy-forward.workspace = true
 xproxy-reverse.workspace = true
+tokio.workspace = true
 
 [lints]
 workspace = true
