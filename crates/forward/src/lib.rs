@@ -2,6 +2,7 @@ pub mod connect;
 pub mod demux;
 pub mod dns;
 pub mod http;
+pub mod socks;
 
 pub use connect::{
     ConnectTarget, DEFAULT_ALLOW_PORTS, is_port_allowed, parse_target, validate_target,
@@ -11,6 +12,7 @@ pub use dns::{ResolveMode, http_connect_is_remote, should_resolve_remotely};
 pub use http::{
     append_via, append_via_req, forwarding_client, is_absolute_form, strip_hop_headers,
 };
+pub use socks::{AuthMethod, SocksCommand, SocksVersion, check_basic_auth};
 
 use xproxy_core::{Config, Proxy, ProxyMode};
 
