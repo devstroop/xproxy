@@ -1,4 +1,6 @@
-//! Forward proxy — boilerplate only.
+pub mod demux;
+
+pub use demux::{Protocol, dispatch, peek_protocol};
 
 use xproxy_core::{Config, Proxy, ProxyMode};
 
