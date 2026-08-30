@@ -594,6 +594,7 @@ dependencies = [
 name = "xproxy-forward"
 version = "0.1.0"
 dependencies = [
+ "tokio",
  "xproxy-core",
 ]
 
